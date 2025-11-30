@@ -1,45 +1,69 @@
 import Link from "next/link";
 
+
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] text-center">
-      <section className="max-w-3xl space-y-6">
-        <h1 className="text-5xl font-bold text-primary">
-          Community Emergency Response
-        </h1>
-        <p className="text-xl text-gray-600">
-          Connecting people in need with volunteers and resources during emergencies.
-          Real-time updates, verified resources, and community support.
-        </p>
-        
-        <div className="flex gap-4 justify-center mt-8">
-          <Link 
-            href="/requests/create"
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-colors text-lg"
-          >
-            I Need Help
-          </Link>
-          <Link 
-            href="/volunteer"
-            className="bg-primary hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-colors text-lg"
-          >
-            I Can Help
-          </Link>
+    <div className="flex flex-col">
+      {/* Hero Section */}
+      <section className="bg-white text-gray-900 py-20 text-center border-b border-gray-200">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <h1 className="text-5xl font-bold mb-6 leading-tight text-primary">
+            Community Emergency Response
+          </h1>
+          <p className="text-xl mb-10 text-gray-700">
+            Connecting people in need with volunteers, hospitals, and resources during emergencies.
+            Real-time updates, verified data, and community support.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              href="/requests/create"
+              className="bg-red-500 text-white hover:bg-red-600 font-bold py-4 px-8 rounded-lg shadow-lg transition-all text-lg"
+            >
+              Request Urgent Help
+            </Link>
+            <Link 
+              href="/volunteer"
+              className="bg-green-500 text-white hover:bg-green-600 font-bold py-4 px-8 rounded-lg shadow-lg transition-all text-lg"
+            >
+              Join as Volunteer
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
-        <div className="p-6 bg-white rounded-xl shadow-md border border-gray-100">
-          <h3 className="text-xl font-bold text-gray-800 mb-2">Real-time Alerts</h3>
-          <p className="text-gray-600">Get instant notifications about emergencies in your area.</p>
-        </div>
-        <div className="p-6 bg-white rounded-xl shadow-md border border-gray-100">
-          <h3 className="text-xl font-bold text-gray-800 mb-2">Resource Map</h3>
-          <p className="text-gray-600">Find nearby shelters, hospitals, and supplies on our interactive map.</p>
-        </div>
-        <div className="p-6 bg-white rounded-xl shadow-md border border-gray-100">
-          <h3 className="text-xl font-bold text-gray-800 mb-2">Verified Volunteers</h3>
-          <p className="text-gray-600">Connect with registered volunteers and NGOs ready to assist.</p>
+      {/* Features Section */}
+      <section className="py-16 container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="p-8 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-2xl mb-4">
+              📢
+            </div>
+            <h3 className="text-xl font-bold text-dark mb-3">Real-time Alerts</h3>
+            <p className="text-medium leading-relaxed">
+              Get instant notifications about emergencies in your area. Stay informed and safe with verified updates.
+            </p>
+          </div>
+          
+          <div className="p-8 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-4">
+              🗺️
+            </div>
+            <h3 className="text-xl font-bold text-dark mb-3">Resource Map</h3>
+            <p className="text-medium leading-relaxed">
+              Find nearby shelters, hospitals, blood banks, and supplies on our interactive community map.
+            </p>
+          </div>
+          
+          <div className="p-8 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 bg-green-100 text-primary rounded-full flex items-center justify-center text-2xl mb-4">
+              🤝
+            </div>
+            <h3 className="text-xl font-bold text-dark mb-3">Verified Volunteers</h3>
+            <p className="text-medium leading-relaxed">
+              Connect with registered volunteers and NGOs who are ready to assist. Trustworthy and organized response.
+            </p>
+          </div>
         </div>
       </section>
     </div>
