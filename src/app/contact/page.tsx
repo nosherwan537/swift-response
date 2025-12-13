@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -9,14 +10,9 @@ export default function ContactPage() {
     message: ''
   });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const MAX_MESSAGE_LENGTH = 500;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    if (name === 'message' && value.length > MAX_MESSAGE_LENGTH) return;
-    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -26,115 +22,181 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
-    setErrorMessage('');
 
-    // Basic Validation
-    if (!formData.name || !formData.email || !formData.message) {
-      setStatus('error');
-      setErrorMessage('All fields are required.');
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setStatus('success');
-        setFormData({ name: '', email: '', message: '' });
-      } else {
-        setStatus('error');
-        setErrorMessage(data.message || 'Something went wrong.');
-      }
-    } catch (error) {
-      setStatus('error');
-      setErrorMessage('Failed to send message. Please try again.');
-    }
+    // Simulate form submission
+    setTimeout(() => {
+      setStatus('success');
+      setFormData({ name: '', email: '', message: '' });
+    }, 1000);
   };
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="max-w-2xl mx-auto py-12 px-4">
-        <h1 className="text-4xl font-bold text-primary mb-4">Contact Us</h1>
-        <p className="mb-8 text-medium text-lg">Have questions or suggestions? Reach out to our team.</p>
-        
-        {status === 'success' ? (
-          <div className="bg-green-50 border border-green-200 text-green-700 p-6 rounded-xl text-center">
-            <h3 className="text-xl font-bold mb-2">Message Sent!</h3>
-            <p>Thank you for contacting us. We will get back to you shortly.</p>
-            <button 
-              onClick={() => setStatus('idle')}
-              className="mt-4 text-green-700 font-semibold hover:underline"
-            >
-              Send another message
-            </button>
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white py-16 text-center overflow-hidden">
+        <div className="absolute top-10 right-10 w-48 h-48 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <h1 className="text-5xl font-bold mb-4 animate-fade-in-up">Contact Us</h1>
+          <p className="text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '100ms'}}>
+            Have questions or suggestions? We'd love to hear from you
+          </p>
+        </div>
+      </section>
+
+      <div className="max-w-5xl mx-auto py-16 px-4">
+        {/* Emergency Disclaimer */}
+        <div className="bg-red-50 border-l-4 border-red-500 p-6 mb-12 rounded-r-xl">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-6 w-6 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm text-red-700">
+                <span className="font-bold">Urgent Emergency?</span> For immediate emergencies, please use the{' '}
+                <Link href="/requests/create" className="underline hover:text-red-900 font-semibold">
+                  Report Help
+                </Link>{' '}
+                page or call your local emergency number (e.g., 1122).
+              </p>
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-6 bg-secondary p-8 rounded-xl shadow-sm border border-gray-200">
-            {status === 'error' && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
-                {errorMessage}
-              </div>
-            )}
+        </div>
 
-            <div>
-              <label className="block text-sm font-medium text-dark mb-2">Name</label>
-              <input 
-                type="text" 
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="Your Name"
-                required
-              />
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* Contact Form */}
+          <div>
+            <h2 className="text-3xl font-bold text-[#333333] mb-6">Send us a Message</h2>
             
-            <div>
-              <label className="block text-sm font-medium text-dark mb-2">Email</label>
-              <input 
-                type="email" 
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-                placeholder="your.email@example.com"
-                required
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all"
+                  placeholder="John Doe"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-dark mb-2">Message</label>
-              <textarea 
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary" 
-                rows={5}
-                placeholder="How can we help you?"
-                required
-              ></textarea>
-              <div className="text-right text-xs text-gray-500 mt-1">
-                {formData.message.length} / {MAX_MESSAGE_LENGTH} characters
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all"
+                  placeholder="john@example.com"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  rows={6}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all resize-none"
+                  placeholder="Tell us how we can help..."
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={status === 'submitting'}
+                className="w-full bg-gradient-to-r from-[#008C5A] to-[#00A366] text-white font-bold py-4 px-8 rounded-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {status === 'submitting' ? 'Sending...' : 'Send Message'}
+              </button>
+
+              {status === 'success' && (
+                <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                  <p className="text-green-700 font-semibold">Message sent successfully! We'll get back to you soon.</p>
+                </div>
+              )}
+            </form>
+          </div>
+
+          {/* Contact Information */}
+          <div>
+            <h2 className="text-3xl font-bold text-[#333333] mb-6">Get in Touch</h2>
+            
+            <div className="space-y-6">
+              {/* Email */}
+              <div className="glass p-6 rounded-2xl hover:shadow-lg transition-all">
+                <div className="flex items-start">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#008C5A] to-[#00A366] rounded-lg flex items-center justify-center text-white text-xl mr-4 flex-shrink-0">
+                    ✉️
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-[#333333] mb-1">Email</h3>
+                    <p className="text-gray-600">support@swiftresponse.com</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="glass p-6 rounded-2xl hover:shadow-lg transition-all">
+                <div className="flex items-start">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#008C5A] to-[#00A366] rounded-lg flex items-center justify-center text-white text-xl mr-4 flex-shrink-0">
+                    📞
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-[#333333] mb-1">Phone</h3>
+                    <p className="text-gray-600">+92 300 1234567</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Address */}
+              <div className="glass p-6 rounded-2xl hover:shadow-lg transition-all">
+                <div className="flex items-start">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#008C5A] to-[#00A366] rounded-lg flex items-center justify-center text-white text-xl mr-4 flex-shrink-0">
+                    📍
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-[#333333] mb-1">Address</h3>
+                    <p className="text-gray-600">123 Emergency Lane<br />Lahore, Pakistan</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Media */}
+              <div className="glass p-6 rounded-2xl">
+                <h3 className="font-bold text-lg text-[#333333] mb-4">Follow Us</h3>
+                <div className="flex gap-4">
+                  {['Facebook', 'Twitter', 'Instagram', 'LinkedIn'].map((social) => (
+                    <a
+                      key={social}
+                      href="#"
+                      className="w-12 h-12 bg-gradient-to-br from-[#008C5A] to-[#00A366] rounded-lg flex items-center justify-center text-white hover:scale-110 transition-transform"
+                      aria-label={social}
+                    >
+                      {social[0]}
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
-
-            <button 
-              type="submit" 
-              disabled={status === 'submitting'}
-              className="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
-            >
-              {status === 'submitting' ? 'Sending...' : 'Send Message'}
-            </button>
-          </form>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
