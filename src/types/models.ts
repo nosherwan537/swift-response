@@ -37,3 +37,15 @@ export interface IResource {
   description?: string;
   created_at: string;
 }
+
+export interface IVolunteerRegistration {
+  id: string;
+  request_id: string;
+  volunteer_id: string;
+  message?: string;
+  contact_info: string;
+  created_at: string;
+  // Joins
+  volunteer?: IUser;
+  request?: IEmergencyRequest;
+}

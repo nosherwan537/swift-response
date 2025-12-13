@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 export default function RequestHelpPage() {
   const [formData, setFormData] = useState({
-    type: 'Medical Help',
+    type: 'Medical',
     description: '',
     location: '',
     urgency: 'High',
@@ -55,12 +55,12 @@ export default function RequestHelpPage() {
 
     const location = { lat: 0, lng: 0, address: formData.location };
 
+    // Note: urgency is used for UI but not stored in DB currently as per schema
     const { error } = await supabase.from('emergency_requests').insert({
       requester_id: user.id,
       type: formData.type,
-      description: formData.description,
+      description: `${formData.urgency} Urgency: ${formData.description}`, // Prepend urgency to description since column doesn't exist
       location,
-      urgency: formData.urgency,
       status: 'pending'
     });
 
@@ -85,9 +85,9 @@ export default function RequestHelpPage() {
   return (
     <div className="bg-white relative min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center  bg-gradient-to-br from-[#DC3545] to-[#C82333] text-white py-16 text-center overflow-hidden">
+      <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-[#DC3545] to-[#C82333] text-white overflow-hidden">
         <div className="absolute top-10 right-10 w-48 h-48 bg-white opacity-10 rounded-full blur-3xl animate-float"></div>
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-5xl font-bold mb-4 animate-fade-in-up">Report Emergency</h1>
           <p className="text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '100ms'}}>
             Get immediate help by reporting your emergency
@@ -143,13 +143,14 @@ export default function RequestHelpPage() {
               required
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DC3545] focus:border-transparent transition-all"
             >
-              <option value="Medical Help">🏥 Medical Help</option>
+              <option value="Medical">🏥 Medical Help</option>
               <option value="Fire">🔥 Fire</option>
               <option value="Flood">🌊 Flood</option>
-              <option value="Earthquake">🏚️ Earthquake</option>
-              <option value="Accident">🚨 Accident</option>
+              {/* Mapped extra types to 'Other' or nearest equivalent or just use 'Other' for now to match schema */}
               <option value="Rescue">🆘 Rescue</option>
-              <option value="Supplies Needed">📦 Supplies Needed</option>
+              <option value="Other">🏚️ Earthquake (Other)</option>
+              <option value="Other">🚨 Accident (Other)</option>
+              <option value="Other">📦 Supplies Needed (Other)</option>
               <option value="Other">⚠️ Other</option>
             </select>
           </div>

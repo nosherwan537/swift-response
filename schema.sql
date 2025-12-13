@@ -64,6 +64,10 @@ create policy "Volunteers and Admins can update status."
     )
   );
 
+create policy "Requester can delete their own request."
+  on public.emergency_requests for delete
+  using ( auth.uid() = requester_id );
+
 -- 3. RESOURCES TABLE
 create table public.resources (
   id uuid default uuid_generate_v4() primary key,
@@ -110,3 +114,41 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- 5. VOLUNTEER REGISTRATIONS TABLE
+create table public.volunteer_registrations (
+  id uuid default uuid_generate_v4() primary key,
+  request_id uuid references public.emergency_requests(id) on delete cascade not null,
+  volunteer_id uuid references public.profiles(id) on delete cascade not null,
+  message text,
+  contact_info text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  unique(request_id, volunteer_id)
+);
+
+-- Enable RLS
+alter table public.volunteer_registrations enable row level security;
+
+-- Policies for Volunteer Registrations
+
+-- Volunteers can register themselves
+create policy "Volunteers can register themselves."
+  on public.volunteer_registrations for insert
+  with check ( auth.uid() = volunteer_id );
+
+-- Volunteers can see their own registrations
+create policy "Volunteers can see their own registrations."
+  on public.volunteer_registrations for select
+  using ( auth.uid() = volunteer_id );
+
+-- Requesters can see volunteers for their requests
+create policy "Requesters can see volunteers for their requests."
+  on public.volunteer_registrations for select
+  using (
+    exists (
+      select 1 from public.emergency_requests
+      where emergency_requests.id = volunteer_registrations.request_id
+      and emergency_requests.requester_id = auth.uid()
+    )
+  );
+

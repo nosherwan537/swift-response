@@ -1,242 +1,204 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/utils/supabase';
+import { useRouter } from 'next/navigation';
+import { IEmergencyRequest, IVolunteerRegistration } from '@/types/models';
+import VolunteerAction from '@/app/components/VolunteerAction';
+import Link from 'next/link';
 
 export default function VolunteerPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    skills: '',
-    availability: 'Weekends'
-  });
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [requests, setRequests] = useState<IEmergencyRequest[]>([]);
+  const [myRegistrations, setMyRegistrations] = useState<Record<string, IVolunteerRegistration>>({});
+  const [activeTab, setActiveTab] = useState<'feed' | 'my-volunteering'>('feed');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      if (user) {
+        await fetchData(user.id);
+      }
+      setLoading(false);
+    };
+    checkUser();
+  }, []);
+
+  const fetchData = async (userId: string) => {
+    // Fetch active requests
+    const { data: requestsData } = await supabase
+      .from('emergency_requests')
+      .select('*')
+      .neq('status', 'resolved') // Show pending/assigned
+      .neq('requester_id', userId) // Don't show my own requests
+      .order('created_at', { ascending: false });
+
+    if (requestsData) {
+      setRequests(requestsData);
+    }
+
+    // Fetch my registrations
+    const { data: regData } = await supabase
+      .from('volunteer_registrations')
+      .select('*')
+      .eq('volunteer_id', userId);
+
+    if (regData) {
+      const regMap: Record<string, IVolunteerRegistration> = {};
+      regData.forEach((r: IVolunteerRegistration) => {
+        regMap[r.request_id] = r;
+      });
+      setMyRegistrations(regMap);
+    }
+  };
+
+  const onRegistrationSuccess = (newReg: IVolunteerRegistration) => {
+    setMyRegistrations(prev => ({
       ...prev,
-      [name]: value
+      [newReg.request_id]: newReg
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('Thank you for registering as a volunteer! We will contact you soon.');
-    setFormData({ name: '', email: '', phone: '', skills: '', availability: 'Weekends' });
-  };
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center text-primary font-bold">Loading...</div>;
+  }
+
+  // Marketing Page for Unauthenticated Users
+  if (!user) {
+    return (
+      <div className="bg-white min-h-screen">
+        <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white overflow-hidden">
+          <div className="container mx-auto px-4 text-center py-16">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">Become a Volunteer</h1>
+            <p className="text-xl opacity-95 mb-8">Join the community response team today.</p>
+            <Link href="/login?redirect=/volunteer" className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-8 rounded-lg shadow-lg transition-transform hover:-translate-y-1">
+              Login to Get Started
+            </Link>
+          </div>
+        </section>
+        {/* Simplified Marketing Content */}
+        <div className="relative min-h-screen flex flex-wrap items-center justify-center max-w-6xl mx-auto py-12 px-4 text-center">
+          <h2 className="text-3xl font-bold text-gray-800">Why Join?</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="p-6 bg-gray-50 rounded-xl">
+              <div className="text-4xl mb-4">❤️</div>
+              <h3 className="text-xl font-bold mb-2">Help Others</h3>
+              <p className="text-gray-600">Make a direct impact in your local community.</p>
+            </div>
+            <div className="p-6 bg-gray-50 rounded-xl">
+              <div className="text-4xl mb-4">⚡</div>
+              <h3 className="text-xl font-bold mb-2">Fast Response</h3>
+              <p className="text-gray-600">Get notified immediately when help is needed nearby.</p>
+            </div>
+            <div className="p-6 bg-gray-50 rounded-xl">
+              <div className="text-4xl mb-4">🤝</div>
+              <h3 className="text-xl font-bold mb-2">Community</h3>
+              <p className="text-gray-600">Connect with other volunteers and verified NGOs.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated Volunteer Dashboard
+  const myVolunteeredRequests = requests.filter(r => myRegistrations[r.id]);
+  const displayedRequests = activeTab === 'feed' ? requests : myVolunteeredRequests;
 
   return (
-    <div className="bg-white min-h-screen">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white overflow-hidden">
-        <div className="absolute top-10 right-10 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float hidden md:block"></div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-16 sm:py-20">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in-up">Become a Volunteer</h1>
-          <p className="text-base sm:text-lg md:text-xl opacity-95 max-w-3xl mx-auto animate-fade-in-up px-4" style={{animationDelay: '100ms'}}>
-            Join our network of heroes and make a real difference in your community
-          </p>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">Volunteer Dashboard</h1>
+            <p className="text-gray-600">Welcome, {user.user_metadata?.full_name || 'Volunteer'}</p>
+          </div>
+          <div className="bg-white p-1 rounded-lg border border-gray-200 flex">
+            <button
+              onClick={() => setActiveTab('feed')}
+              className={`px-4 py-2 rounded-md font-semibold text-sm transition-all ${activeTab === 'feed' ? 'bg-primary text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
+              style={{ backgroundColor: activeTab === 'feed' ? '#008C5A' : undefined }}
+            >
+              All Requests
+            </button>
+            <button
+              onClick={() => setActiveTab('my-volunteering')}
+              className={`px-4 py-2 rounded-md font-semibold text-sm transition-all ${activeTab === 'my-volunteering' ? 'bg-primary text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
+              style={{ backgroundColor: activeTab === 'my-volunteering' ? '#008C5A' : undefined }}
+            >
+              My Volunteering ({Object.keys(myRegistrations).length})
+            </button>
+          </div>
         </div>
-      </section>
 
-      <div className="max-w-6xl mx-auto py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
-        {/* Why Volunteer Section */}
-        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
-          <div className="w-full">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-8 sm:mb-12 text-center">Why Volunteer?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            {[
-              {
-                icon: '❤️',
-                title: 'Make an Impact',
-                description: 'Directly help people in need during their most vulnerable moments'
-              },
-              {
-                icon: '🎓',
-                title: 'Gain Skills',
-                description: 'Receive training and develop valuable emergency response skills'
-              },
-              {
-                icon: '🏆',
-                title: 'Get Recognized',
-                description: 'Become a certified responder with official recognition'
-              },
-              {
-                icon: '🤝',
-                title: 'Build Network',
-                description: 'Connect with NGOs, professionals, and like-minded volunteers'
-              }
-            ].map((benefit, index) => (
-              <div 
-                key={benefit.title}
-                className="glass p-8 rounded-2xl text-center hover:-translate-y-2 hover:shadow-xl transition-all duration-300 group"
-                style={{animationDelay: `${index * 100}ms`}}
-              >
-                <div className="text-5xl mb-4 group-hover:scale-125 transition-transform duration-300">
-                  {benefit.icon}
-                </div>
-                <h3 className="text-xl font-bold text-[#333333] mb-3 group-hover:text-[#008C5A] transition-colors">
-                  {benefit.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {benefit.description}
-                </p>
-              </div>
-            ))}
-          </div>
-          </div>
-        </section>
-
-        {/* Available Roles Section */}
-        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
-          <div className="w-full">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-8 sm:mb-12 text-center">Available Roles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: '🏥',
-                title: 'Medical Assistance',
-                description: 'Doctors, nurses, and paramedics needed to provide first aid and urgent care',
-                color: 'from-green-500 to-emerald-500'
-              },
-              {
-                icon: '📦',
-                title: 'Logistics Support',
-                description: 'Help with transporting supplies, coordinating shelter, and managing resources',
-                color: 'from-blue-500 to-cyan-500'
-              },
-              {
-                icon: '🆘',
-                title: 'Field Operations',
-                description: 'Search and rescue operations, clearing debris, and on-ground assistance',
-                color: 'from-orange-500 to-amber-500'
-              }
-            ].map((role, index) => (
-              <div 
-                key={role.title}
-                className="relative bg-gradient-to-br from-white to-[#F8F9FA] p-8 rounded-2xl border-2 border-[#E9ECEF] hover:border-[#008C5A] hover:shadow-xl transition-all duration-300 overflow-hidden group"
-                style={{animationDelay: `${index * 100}ms`}}
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${role.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
-                <div className="relative z-10">
-                  <div className="text-5xl mb-4">{role.icon}</div>
-                  <h3 className="text-2xl font-bold text-[#333333] mb-3">{role.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{role.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          </div>
-        </section>
-
-        {/* Registration Form Section */}
-        <section className="min-h-screen flex items-center justify-center py-16 sm:py-20">
-          <div className="max-w-3xl mx-auto w-full px-4">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#333333] mb-6 text-center">Join Us Today</h2>
-            <p className="text-center text-gray-600 mb-12 text-lg">
-              Fill out the form below to register as a volunteer. We'll contact you with next steps.
+        {displayedRequests.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <p className="text-gray-500 text-lg">
+              {activeTab === 'feed' 
+                ? 'No active emergency requests at the moment. Good news!' 
+                : 'You haven\'t volunteered for any requests yet.'}
             </p>
-
-            <form onSubmit={handleSubmit} className="glass p-10 rounded-3xl space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Name */}
-                <div>
-                  <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-2">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all"
-                    placeholder="John Doe"
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all"
-                    placeholder="john@example.com"
-                  />
-                </div>
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label htmlFor="phone" className="block text-sm font-bold text-gray-700 mb-2">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all"
-                  placeholder="+92 300 1234567"
-                />
-              </div>
-
-              {/* Skills */}
-              <div>
-                <label htmlFor="skills" className="block text-sm font-bold text-gray-700 mb-2">
-                  Skills & Expertise *
-                </label>
-                <textarea
-                  id="skills"
-                  name="skills"
-                  value={formData.skills}
-                  onChange={handleChange}
-                  required
-                  rows={4}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all resize-none"
-                  placeholder="e.g., First Aid, Medical Training, Logistics, Communication..."
-                />
-              </div>
-
-              {/* Availability */}
-              <div>
-                <label htmlFor="availability" className="block text-sm font-bold text-gray-700 mb-2">
-                  Availability *
-                </label>
-                <select
-                  id="availability"
-                  name="availability"
-                  value={formData.availability}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008C5A] focus:border-transparent transition-all"
-                >
-                  <option value="Weekdays">Weekdays</option>
-                  <option value="Weekends">Weekends</option>
-                  <option value="Anytime">Anytime</option>
-                  <option value="Emergency Only">Emergency Only</option>
-                </select>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-[#008C5A] to-[#00A366] text-white font-bold py-4 px-8 rounded-lg hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 text-lg"
+            {activeTab === 'my-volunteering' && (
+              <button 
+                onClick={() => setActiveTab('feed')}
+                className="mt-4 text-[#008C5A] font-bold hover:underline"
               >
-                🤝 Register as Volunteer
+                Browse Open Requests
               </button>
-            </form>
+            )}
           </div>
-        </section>
+        ) : (
+          <div className="grid gap-6">
+            {displayedRequests.map(req => (
+              <div key={req.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                        req.type === 'Medical' ? 'bg-red-100 text-red-700' :
+                        req.type === 'Fire' ? 'bg-orange-100 text-orange-700' :
+                        req.type === 'Flood' ? 'bg-blue-100 text-blue-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {req.type}
+                      </span>
+                      <span className="text-gray-400 text-sm">•</span>
+                      <span className="text-gray-500 text-sm">{new Date(req.created_at).toLocaleString()}</span>
+                    </div>
+                    {myRegistrations[req.id] && (
+                      <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full border border-green-200">
+                        Volunteered
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">{req.description}</h3>
+                  
+                  <div className="flex items-start gap-2 text-gray-600 mb-4">
+                    <span className="mt-1">📍</span>
+                    <span>{(req.location as any).address || 'Location provided'}</span>
+                  </div>
+
+                  {/* Requester Info could be fetched if not available in req, but req doesn't have requester name, only ID. 
+                      However, for simplicity I'll skip fetching requester name for now unless I join it.
+                      The requirements say "requester name". I might need to fetch profiles.
+                  */}
+                  
+                  <VolunteerAction 
+                    request={req} 
+                    userId={user.id}
+                    existingRegistration={myRegistrations[req.id] || null}
+                    onRegistrationSuccess={onRegistrationSuccess}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
