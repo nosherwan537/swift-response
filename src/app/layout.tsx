@@ -65,7 +65,7 @@ export default function RootLayout({
           {children}
         </main>
 
-        <footer className="bg-[#333333] text-white py-8 mt-12">
+        <footer className="bg-[#333333] text-white py-8">
           <div className="container mx-auto px-4 text-center">
             <p className="font-semibold text-lg mb-2">Swift Response</p>
             <p className="text-[#F8F9FA] opacity-80 text-sm">
