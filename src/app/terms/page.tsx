@@ -1,16 +1,20 @@
+import HeroCardSection from '@/components/hero/HeroCardSection';
+
 export default function TermsPage() {
+  const heroCards = [
+    { title: 'Clear and simple terms', icon: '📝' },
+    { title: 'Easy-to-understand policies', icon: '✅' },
+    { title: 'Fair and transparent rules', icon: '⚖️' }
+  ];
+
   return (
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white overflow-hidden">
-        <div className="absolute top-10 right-10 w-48 h-48 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float hidden md:block"></div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-16">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 animate-fade-in-up">Terms of Service</h1>
-          <p className="text-base sm:text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up px-4" style={{animationDelay: '100ms'}}>
-            Please read these terms carefully before using our platform
-          </p>
-        </div>
-      </section>
+      <HeroCardSection 
+        cards={heroCards}
+        pageTitle="Terms of Service"
+        subtitle="Please read these terms carefully before using our platform"
+      />
 
       <div className="min-h-screen flex items-center justify-center py-12 sm:py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full">

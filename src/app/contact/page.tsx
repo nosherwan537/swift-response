@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import HeroCardSection from '@/components/hero/HeroCardSection';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -30,18 +31,20 @@ export default function ContactPage() {
     }, 1000);
   };
 
+  const heroCards = [
+    { title: 'We are always here to listen to you', icon: '👂' },
+    { title: 'Quick responses to your queries', icon: '⚡' },
+    { title: 'Multiple ways to reach us', icon: '📞' }
+  ];
+
   return (
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-[#008C5A] to-[#006B47] text-white overflow-hidden">
-        <div className="absolute top-10 right-10 w-48 h-48 bg-[#FFD700] opacity-10 rounded-full blur-3xl animate-float hidden md:block"></div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-16">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 animate-fade-in-up">Contact Us</h1>
-          <p className="text-base sm:text-lg opacity-95 max-w-2xl mx-auto animate-fade-in-up px-4" style={{animationDelay: '100ms'}}>
-            Have questions or suggestions? We'd love to hear from you
-          </p>
-        </div>
-      </section>
+      <HeroCardSection 
+        cards={heroCards}
+        pageTitle="Contact Us"
+        subtitle="Have questions or suggestions? We'd love to hear from you"
+      />
 
       <div className="max-w-5xl mx-auto py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         <div className="min-h-screen flex items-center justify-center py-12 sm:py-16">
@@ -184,16 +187,42 @@ export default function ContactPage() {
               <div className="glass p-6 rounded-2xl">
                 <h3 className="font-bold text-lg text-[#333333] mb-4">Follow Us</h3>
                 <div className="flex gap-4">
-                  {['Facebook', 'Twitter', 'Instagram', 'LinkedIn'].map((social) => (
-                    <a
-                      key={social}
-                      href="#"
-                      className="w-12 h-12 bg-gradient-to-br from-[#008C5A] to-[#00A366] rounded-lg flex items-center justify-center text-white hover:scale-110 transition-transform"
-                      aria-label={social}
-                    >
-                      {social[0]}
-                    </a>
-                  ))}
+                  <a
+                    href="https://facebook.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-white rounded-lg flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+                    aria-label="Facebook"
+                  >
+                    <img src="/Facebook.svg" alt="Facebook" className="w-8 h-8" />
+                  </a>
+                  <a
+                    href="https://linkedin.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-white rounded-lg flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+                    aria-label="LinkedIn"
+                  >
+                    <img src="/linkedin.svg" alt="LinkedIn" className="w-8 h-8" />
+                  </a>
+                  <a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-white rounded-lg flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+                    aria-label="Instagram"
+                  >
+                    <img src="/Instagram-Logo.png" alt="Instagram" className="w-8 h-8" />
+                  </a>
+                  <a
+                    href="https://twitter.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-white rounded-lg flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+                    aria-label="Twitter/X"
+                  >
+                    <img src="/X.png" alt="X (Twitter)" className="w-8 h-8" />
+                  </a>
                 </div>
               </div>
             </div>

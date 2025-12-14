@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'next/navigation';
+import LocationPicker from '@/components/maps/LocationPicker';
 
 export default function RequestHelpPage() {
   const [formData, setFormData] = useState({
     type: 'Medical',
     description: '',
     location: '',
+    coordinates: { lat: 31.5204, lng: 74.3587 }, // Default to Lahore
     urgency: 'High',
     images: null as File[] | null
   });
@@ -46,6 +48,14 @@ export default function RequestHelpPage() {
     }
   };
 
+  const handleLocationSelect = (lat: number, lng: number, address: string) => {
+    setFormData(prev => ({
+      ...prev,
+      location: address,
+      coordinates: { lat, lng }
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -53,7 +63,11 @@ export default function RequestHelpPage() {
     setLoading(true);
     setError(null);
 
-    const location = { lat: 0, lng: 0, address: formData.location };
+    const location = { 
+      lat: formData.coordinates.lat, 
+      lng: formData.coordinates.lng, 
+      address: formData.location 
+    };
 
     // Note: urgency is used for UI but not stored in DB currently as per schema
     const { error } = await supabase.from('emergency_requests').insert({
@@ -199,11 +213,15 @@ export default function RequestHelpPage() {
             />
           </div>
 
-          {/* Location */}
+          {/* Location - Map Picker */}
           <div>
-            <label htmlFor="location" className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-700 mb-3">
               Location *
             </label>
+            <LocationPicker 
+              onLocationSelect={handleLocationSelect}
+              initialLocation={formData.coordinates}
+            />
             <input
               type="text"
               id="location"
@@ -211,11 +229,11 @@ export default function RequestHelpPage() {
               value={formData.location}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DC3545] focus:border-transparent transition-all"
-              placeholder="Enter address or nearby landmarks..."
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#DC3545] focus:border-transparent transition-all mt-3"
+              placeholder="Address will appear here when you select on map..."
             />
             <p className="text-sm text-gray-500 mt-2">
-              📍 Provide your current location or the location of the emergency
+              📍 Click on the map above to select the emergency location, or use the current location button
             </p>
           </div>
 
