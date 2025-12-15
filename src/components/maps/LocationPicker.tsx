@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
+import Loader from '@/components/Loader';
 
 interface LocationPickerProps {
   onLocationSelect: (lat: number, lng: number, address: string) => void;
@@ -107,10 +108,7 @@ export default function LocationPicker({ onLocationSelect, initialLocation }: Lo
   if (!isLoaded) {
     return (
       <div className="w-full h-[400px] bg-gray-100 rounded-xl flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#008C5A] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading map...</p>
-        </div>
+        <Loader className="min-h-0" text="Loading map..." />
       </div>
     );
   }

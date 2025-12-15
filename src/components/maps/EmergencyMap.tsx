@@ -2,6 +2,8 @@
 
 import { useCallback, useState } from 'react';
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
+import { Map, MapPin } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 interface Emergency {
   id: string;
@@ -42,7 +44,7 @@ export default function EmergencyMap({ emergencies }: EmergencyMapProps) {
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
-    
+
     // Fit bounds to show all emergencies
     if (emergencies.length > 0) {
       const bounds = new google.maps.LatLngBounds();
@@ -68,9 +70,9 @@ export default function EmergencyMap({ emergencies }: EmergencyMapProps) {
       'Rescue': '#FFD700',
       'Other': '#6C757D'
     };
-    
+
     const color = colors[type] || '#DC3545';
-    
+
     return {
       path: google.maps.SymbolPath.CIRCLE,
       fillColor: color,
@@ -88,10 +90,7 @@ export default function EmergencyMap({ emergencies }: EmergencyMapProps) {
   if (!isLoaded) {
     return (
       <div className="w-full h-[500px] bg-gray-100 rounded-xl flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#008C5A] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading map...</p>
-        </div>
+        <Loader className="min-h-0" text="Loading map..." />
       </div>
     );
   }
@@ -103,8 +102,8 @@ export default function EmergencyMap({ emergencies }: EmergencyMapProps) {
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-center">
-        <p className="text-sm font-semibold text-gray-700">
-          🗺️ Your Emergencies Map ({emergencies.length} {emergencies.length === 1 ? 'emergency' : 'emergencies'})
+        <p className="text-sm font-semibold text-gray-700 flex gap-2">
+          <Map /> Your Emergencies Map ({emergencies.length} {emergencies.length === 1 ? 'emergency' : 'emergencies'})
         </p>
       </div>
       <div className="border-2 border-gray-300 rounded-xl overflow-hidden shadow-lg">
@@ -122,7 +121,7 @@ export default function EmergencyMap({ emergencies }: EmergencyMapProps) {
         >
           {emergencies.map((emergency) => {
             if (!emergency.location?.lat || !emergency.location?.lng) return null;
-            
+
             return (
               <Marker
                 key={emergency.id}
@@ -140,19 +139,17 @@ export default function EmergencyMap({ emergencies }: EmergencyMapProps) {
             >
               <div className="p-2 max-w-xs">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${
-                    selectedEmergency.type === 'Medical' ? 'bg-red-100 text-red-700' :
+                  <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${selectedEmergency.type === 'Medical' ? 'bg-red-100 text-red-700' :
                     selectedEmergency.type === 'Fire' ? 'bg-orange-100 text-orange-700' :
-                    selectedEmergency.type === 'Flood' ? 'bg-blue-100 text-blue-700' :
-                    'bg-gray-100 text-gray-700'
-                  }`}>
+                      selectedEmergency.type === 'Flood' ? 'bg-blue-100 text-blue-700' :
+                        'bg-gray-100 text-gray-700'
+                    }`}>
                     {selectedEmergency.type}
                   </span>
-                  <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${
-                    selectedEmergency.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                  <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${selectedEmergency.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                     selectedEmergency.status === 'resolved' ? 'bg-green-100 text-green-700' :
-                    'bg-blue-100 text-blue-700'
-                  }`}>
+                      'bg-blue-100 text-blue-700'
+                    }`}>
                     {selectedEmergency.status}
                   </span>
                 </div>

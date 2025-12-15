@@ -9,6 +9,7 @@ import Link from 'next/link';
 import EmergencyFilterPanel from '@/components/volunteer/EmergencyFilterPanel';
 import EmergencyMap from '@/components/maps/EmergencyMap';
 import { Heart, Zap, Users, MapPin } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 export default function VolunteerPage() {
   const [user, setUser] = useState<any>(null);
@@ -158,7 +159,7 @@ export default function VolunteerPage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-primary font-bold">Loading...</div>;
+    return <Loader />;
   }
 
   // Marketing Page for Unauthenticated Users
@@ -240,7 +241,7 @@ export default function VolunteerPage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12  bg-opacity-20 rounded-full flex items-center justify-center">
                     <MapPin className="w-6 h-6 text-white" />
                   </div>
                   <div>

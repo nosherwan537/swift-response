@@ -7,6 +7,7 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import DashboardRequestsSection from '@/components/dashboard/DashboardRequestsSection';
 import EmergencyMap from '@/components/maps/EmergencyMap';
+import Loader from '@/components/Loader';
 
 export default function DashboardPage() {
   const [requests, setRequests] = useState<any[]>([]); // Changed IEmergencyRequest[] to any[] as IEmergencyRequest import was removed
@@ -61,7 +62,7 @@ export default function DashboardPage() {
         .from('emergency_requests')
         .delete()
         .eq('id', id);
-      
+
       if (error) {
         alert('Error deleting request: ' + error.message);
       } else {
@@ -70,28 +71,28 @@ export default function DashboardPage() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Loading Dashboard...</div>;
+  if (loading) return <Loader text="Loading Dashboard..." />;
 
   return (
     <div className="flex flex-col min-h-[800px] bg-white">
-      <DashboardHeader 
+      <DashboardHeader
         userName={user?.user_metadata?.full_name || 'User'}
       />
-      
+
       <div className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        <DashboardStats 
+        <DashboardStats
           userName={user?.user_metadata?.full_name || 'User'}
           userRole={user?.user_metadata?.role || 'User'}
         />
-        
+
         {/* Emergency Map */}
         {requests.length > 0 && (
           <div className="mb-8">
             <EmergencyMap emergencies={requests} />
           </div>
         )}
-        
-        <DashboardRequestsSection 
+
+        <DashboardRequestsSection
           requests={requests}
           onEdit={handleEdit}
           onDelete={handleDelete}
