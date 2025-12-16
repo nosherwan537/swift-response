@@ -28,7 +28,7 @@ export default function Home() {
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[700px] py-16 lg:py-20">
-            
+
             {/* Left Column - Text and Buttons */}
             <div className="text-center lg:text-left">
               <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold mb-6 leading-tight animate-fade-in-up tracking-tight">
@@ -54,6 +54,27 @@ export default function Home() {
                       <p className="text-xs text-gray-500 leading-relaxed">Quickly alert the community about an emergency situation.</p>
                       <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
                         <div className="w-3 h-3 bg-white rotate-45 border-r border-b border-gray-100"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Panic Button for Instant Access */}
+                <div className="relative group">
+                  <Link
+                    href="/emergency"
+                    className="block bg-red-900 border-2 border-red-500 text-white hover:bg-red-950 font-bold py-4 px-8 rounded-xl shadow-lg shadow-red-500/20 transition-all duration-300 text-lg hover:-translate-y-1 hover:shadow-red-500/40 active:scale-95 flex items-center gap-2"
+                  >
+                    <span className="animate-pulse">🚨</span>
+                    <span className="inline-block">Panic Button</span>
+                  </Link>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50">
+                    <div className="bg-gray-900 text-white rounded-lg px-4 py-3 shadow-xl max-w-xs border border-gray-800">
+                      <p className="font-bold mb-1 text-sm text-red-400">Instant SOS</p>
+                      <p className="text-xs text-gray-300 leading-relaxed">One-touch emergency signal activation.</p>
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
+                        <div className="w-3 h-3 bg-gray-900 rotate-45 border-r border-b border-gray-800"></div>
                       </div>
                     </div>
                   </div>
@@ -85,9 +106,9 @@ export default function Home() {
             <div className="relative h-[600px] w-full hidden lg:block">
               {/* Orbit Circle */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] border-2 border-white/20 rounded-full"></div>
-              
+
               {/* Card 1 - Top Right (Active Alerts) */}
-              <div className="absolute top-[8%] right-[8%] p-6 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl animate-float w-64 z-20" style={{animationDelay: '0s'}}>
+              <div className="absolute top-[8%] right-[8%] p-6 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl animate-float w-64 z-20" style={{ animationDelay: '0s' }}>
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <span className="text-[#FFD700] text-sm font-semibold uppercase tracking-wider">Alerts</span>
@@ -104,7 +125,7 @@ export default function Home() {
               </div>
 
               {/* Card 2 - Left (Volunteers) */}
-              <div className="absolute top-1/2 -translate-y-1/2 left-[2%] p-6 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl animate-float w-56 z-10" style={{animationDelay: '1.5s'}}>
+              <div className="absolute top-1/2 -translate-y-1/2 left-[2%] p-6 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl animate-float w-56 z-10" style={{ animationDelay: '1.5s' }}>
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <span className="text-[#FFD700] text-xs font-semibold uppercase tracking-wider">Volunteers</span>
@@ -120,8 +141,8 @@ export default function Home() {
               </div>
 
               {/* Card 3 - Bottom Right (Response) */}
-              <div className="absolute bottom-[8%] right-[15%] p-5 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl animate-float w-48 z-30" style={{animationDelay: '0.8s'}}>
-                 <div className="flex justify-between items-start mb-3">
+              <div className="absolute bottom-[8%] right-[15%] p-5 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl animate-float w-48 z-30" style={{ animationDelay: '0.8s' }}>
+                <div className="flex justify-between items-start mb-3">
                   <div>
                     <span className="text-[#FFD700] text-xs font-semibold uppercase tracking-wider">Response</span>
                   </div>
@@ -228,7 +249,7 @@ export default function Home() {
                     <Icon className={`w-7 h-7 ${cat.color}`} />
                   </div>
                   <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">{cat.name}</span>
-                  
+
                   {/* Tooltip */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50">
                     <div className="bg-gray-900 text-white rounded-lg px-3 py-2 shadow-xl max-w-[200px] text-center">
@@ -307,6 +328,13 @@ export default function Home() {
               className="group bg-white text-[#008C5A] hover:bg-gray-100 font-semibold py-4 px-10 rounded-xl shadow-lg transition-all duration-300 text-base"
             >
               Report Emergency
+            </Link>
+            <Link
+              href="/emergency"
+              className="group bg-red-900 border border-red-500 text-white hover:bg-red-800 font-bold py-4 px-10 rounded-xl shadow-lg transition-all duration-300 text-base flex items-center gap-2"
+            >
+              <span>🚨</span>
+              <span>Panic Button</span>
             </Link>
             <Link
               href="/volunteer"
